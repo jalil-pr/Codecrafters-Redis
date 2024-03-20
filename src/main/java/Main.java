@@ -1,6 +1,9 @@
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class Main {
   public static void main(String[] args){
@@ -18,6 +21,9 @@ public class Main {
          serverSocket.setReuseAddress(true);
          // Wait for connection from client.
          clientSocket = serverSocket.accept();
+         OutputStream outputStream = clientSocket.getOutputStream();
+         outputStream.write("+PONG\r\n".getBytes());                                         // 2nd statement
+        new PrintWriter(clientSocket.getOutputStream(), true);
        } catch (IOException e) {
          System.out.println("IOException: " + e.getMessage());
        } finally {
