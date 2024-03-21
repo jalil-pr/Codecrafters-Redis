@@ -33,9 +33,9 @@ public class Main {
       // Wait for connection from client.
       es = Executors.newFixedThreadPool(4);
       class Handler implements Runnable{
-        Socket clienSocket;
+        Socket clientSocket;
         Handler(Socket clientSocket){
-          this.clienSocket = clientSocket;
+          this.clientSocket = clientSocket;
         }
         @Override
         public void run() {
