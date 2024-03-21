@@ -62,11 +62,12 @@ public class Main {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String inputLine = bufferedReader.readLine();
         while (inputLine != null) {
-          inputLine = bufferedReader.readLine();
-          if (inputLine.contains("ping")) {
+          
+          if (inputLine.contains("ping") || inputLine.equalsIgnoreCase("ping")) {
             outputStream.write("+PONG\r\n".getBytes());
             outputStream.flush();
           } // 2nd statement
+          inputLine = bufferedReader.readLine();
           // new PrintWriter(clientSocket.getOutputStream(), true);
         }
         outputStream.close();
