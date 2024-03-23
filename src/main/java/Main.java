@@ -1,68 +1,45 @@
-
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-
+import java.io.OutputStreamWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import java.util.ArrayList;
-import java.util.List;
+public class Main {
+  public static void main(String[] args) {
+    System.out.println("Logs from your program will appear here!");
+    ServerSocket serverSocket = null;
+    Socket clientSocket = null;
+    int port = 6379;
+    ExecutorService es = null;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-public class Main implements Runnable {
-  Socket clientSocket;
-  String regexArgumentsCounter = "\\*\\d+";
-  String regexArgumentsCounterGroup = "\\*(\\d+)";
-
-  Main(Socket client) {
-    clientSocket = client;
-  }
-
-  @Override
-  public void run() {
     try {
-      BufferedReader br = new BufferedReader(
-          new InputStreamReader(clientSocket.getInputStream()));
-      OutputStream os = clientSocket.getOutputStream();
-      String input = br.readLine();
-      List<String> command = new ArrayList<String>();
-      Pattern pattern = Pattern.compile(regexArgumentsCounterGroup);
-      Matcher matcher;
-      int arguments = 0;
-
-      int argumentsCount = 0;
-      while (input != null) {
-        if (input.contains("ping")) {
-          os.write("+PONG\r\n".getBytes());
-        }
-        if (argumentsCount < arguments) {
-          command.add(input);
-          argumentsCount++;
-
-        }
-        if (input.matches(regexArgumentsCounter)) {
-          matcher = pattern.matcher(input);
-          matcher.find();
-          arguments = Integer.parseInt(matcher.group(1)) * 2;
-
-          command.add(input);
-        }
-        if (arguments == argumentsCount) {
-          Commands commandClass = new CommandBuilder(command).build();
-          os.write(commandClass.execute().getBytes());
-          os.flush();
-          arguments = 0;
-          argumentsCount = 0;
-
-        }
-        input = br.readLine();
+      serverSocket = new ServerSocket(port);
+      serverSocket.setReuseAddress(true);
+      
+      while ((clientSocket = serverSocket.accept())!=null) {
+          ResponseHandler handler = new ResponseHandler(clientSocket);
+          Thread t = new Thread(handler);
+          t.start();
       }
+
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      System.out.println("IOException: " + e.getMessage());
+    } finally {
+      try {
+        if (clientSocket != null) {
+          clientSocket.close();
+        }
+      } catch (IOException e) {
+        System.out.println("IOException: " + e.getMessage());
+      }
     }
+
   }
 }
