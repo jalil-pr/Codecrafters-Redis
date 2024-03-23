@@ -1,79 +1,68 @@
-import java.io.BufferedInputStream;
+
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.ServerSocket;
+
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-public class Main {
-  public static void main(String[] args) {
-    System.out.println("Logs from your program will appear here!");
-    ServerSocket serverSocket = null;
-    Socket clientSocket = null;
-    int port = 6379;
-    ExecutorService es = null;
+import java.util.ArrayList;
+import java.util.List;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Main implements Runnable {
+  Socket clientSocket;
+  String regexArgumentsCounter = "\\*\\d+";
+  String regexArgumentsCounterGroup = "\\*(\\d+)";
+
+  Main(Socket client) {
+    clientSocket = client;
+  }
+
+  @Override
+  public void run() {
     try {
-      serverSocket = new ServerSocket(port);
-      serverSocket.setReuseAddress(true);
-      es = Executors.newFixedThreadPool(4);
-      class Handler implements Runnable {
-        Socket clientSocket;
+      BufferedReader br = new BufferedReader(
+          new InputStreamReader(clientSocket.getInputStream()));
+      OutputStream os = clientSocket.getOutputStream();
+      String input = br.readLine();
+      List<String> command = new ArrayList<String>();
+      Pattern pattern = Pattern.compile(regexArgumentsCounterGroup);
+      Matcher matcher;
+      int arguments = 0;
 
-        Handler(Socket clientSocket) {
-          this.clientSocket = clientSocket;
+      int argumentsCount = 0;
+      while (input != null) {
+        if (input.contains("ping")) {
+          os.write("+PONG\r\n".getBytes());
         }
-
-        @Override
-        public void run() {
-          try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(clientSocket.getOutputStream(),
-                StandardCharsets.UTF_8);
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            String line;
-            while (!(line = in.readLine()).isEmpty()) {
-              System.out.println("Received:" + line);
-              if ("ping".equals(line) || line.contains("ping")) {
-                outputStreamWriter.write("+PONG\r\n");
-                outputStreamWriter.flush();
-              }
-              }
-          } catch (IOException e) {
-            System.out.println("IOException: " + e.getMessage());
-          } finally {
-            try {
-              if (clientSocket != null) {
-                clientSocket.close();
-              }
-            } catch (IOException e) {
-              System.out.println("IOException: " + e.getMessage());
-            }
-          }
+        if (argumentsCount < arguments) {
+          command.add(input);
+          argumentsCount++;
 
         }
+        if (input.matches(regexArgumentsCounter)) {
+          matcher = pattern.matcher(input);
+          matcher.find();
+          arguments = Integer.parseInt(matcher.group(1)) * 2;
 
-      }
-      while ((clientSocket = serverSocket.accept()) != null) {
-        es.submit(new Handler(clientSocket));
-      }
+          command.add(input);
+        }
+        if (arguments == argumentsCount) {
+          Commands commandClass = new CommandBuilder(command).build();
+          os.write(commandClass.execute().getBytes());
+          os.flush();
+          arguments = 0;
+          argumentsCount = 0;
 
+        }
+        input = br.readLine();
+      }
     } catch (IOException e) {
-      System.out.println("IOException: " + e.getMessage());
-    } finally {
-      try {
-        if (clientSocket != null) {
-          clientSocket.close();
-        }
-      } catch (IOException e) {
-        System.out.println("IOException: " + e.getMessage());
-      }
+      throw new RuntimeException(e);
     }
-
   }
 }
