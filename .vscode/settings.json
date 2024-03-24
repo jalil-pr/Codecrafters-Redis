@@ -1,3 +1,4 @@
 {
-    "dotnet.defaultSolution": "MyFirstConsoleApp.sln"
+    "dotnet.defaultSolution": "MyFirstConsoleApp.sln",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

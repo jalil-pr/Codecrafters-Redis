@@ -18,17 +18,15 @@ public class Main {
     Socket clientSocket = null;
     int port = 6379;
     ExecutorService es = null;
-
     try {
       serverSocket = new ServerSocket(port);
       serverSocket.setReuseAddress(true);
-      
       while ((clientSocket = serverSocket.accept())!=null) {
-          ResponseHandler handler = new ResponseHandler(clientSocket);
-          Thread t = new Thread(handler);
-          t.start();
+        ResponseHandler rh =new ResponseHandler(clientSocket);
+        Thread t = new Thread(rh);
+        t.start();
+        
       }
-
     } catch (IOException e) {
       System.out.println("IOException: " + e.getMessage());
     } finally {
