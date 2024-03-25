@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -14,27 +15,49 @@ public class ResponseHandler implements Runnable {
 
   ResponseHandler(Socket client) {
     clientSocket = client;
-
   }
 
   @Override
   public void run() {
-    try {
-      BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+    // get the input and output
+  
+    try{
+      BufferedReader  reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       OutputStream outputStream = clientSocket.getOutputStream();
-      String input = bufferedReader.readLine();
-      while (input != null) {
-        System.out.println("the input>>>" + input);
+      PrintWriter pw = new PrintWriter(outputStream);
+    
+      String input = reader.readLine();
+      if (input != null && !input.isEmpty()) {
+        if (input.startsWith("*")) {
+          int numberOfLines = input.charAt(1);
+          ArrayList<String> storedCommonds = new ArrayList<>(numberOfLines*2);
+          for(int i=0;i<numberOfLines*2;i++){
+            storedCommonds.add(reader.readLine());
+          }
+          String commond = storedCommonds.get(1);
+          switch (commond.toLowerCase()) {
+            case Commands.PING:
+              String toBeSent = "+"+"PONG"+"\r\n";
+              pw.write(toBeSent);
+              break;
+          
+            case Commands.ECHO:
+              String toBeEchoed="$"+storedCommonds.get(3).length()+storedCommonds.get(3)+"\r\n";
+              pw.write(toBeEchoed);
+            default:
+              pw.write("WRONG COMMOND!");
+          }
 
-        var result = ProtocolParser.parse(input);
-        var finalResult = ProtocolParser.encode(result);
-        byte[] b = finalResult.getBytes(StandardCharsets.UTF_8);
-        outputStream.write(b);
-
+          
+        }else {
+            pw.write("WRONG COMMOND");
+        } 
       }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+
+    }catch(Exception e){
+
     }
+   
   }
 
 }
