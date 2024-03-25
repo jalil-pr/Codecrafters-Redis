@@ -35,6 +35,9 @@ public class ResponseHandler implements Runnable {
             storedCommonds.add(reader.readLine());
           }
           String commond = storedCommonds.get(1);
+          System.out.println("<<<the commond>>>");
+          System.out.println(commond);
+          System.out.println("the PING for reference"+Commands.PING);
           switch (commond.toLowerCase()) {
             case Commands.PING:
               String toBeSent = "+PONG"+"\r\n";
