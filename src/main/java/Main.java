@@ -21,11 +21,11 @@ public class Main {
     try {
       serverSocket = new ServerSocket(port);
       serverSocket.setReuseAddress(true);
-      while ((clientSocket = serverSocket.accept())!=null) {
-        ResponseHandler rh =new ResponseHandler(clientSocket);
+      while ((clientSocket = serverSocket.accept()) != null) {
+        ResponseHandler rh = new ResponseHandler(clientSocket);
         Thread t = new Thread(rh);
         t.start();
-        
+
       }
     } catch (IOException e) {
       System.out.println("IOException: " + e.getMessage());

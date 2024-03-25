@@ -27,7 +27,8 @@ public class ResponseHandler implements Runnable {
         System.out.println("the input>>>" + input);
         if (input != null) {
           var result = ProtocolParser.parse(input);
-          byte []b = result.getBytes(StandardCharsets.UTF_8);
+          var finalResult = ProtocolParser.encode(result);
+          byte []b = finalResult.getBytes(StandardCharsets.UTF_8);
           outputStream.write(b);
         }
       }

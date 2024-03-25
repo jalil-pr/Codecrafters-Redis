@@ -22,6 +22,13 @@ public class ProtocolParser {
 
         return result;
     }
+    public static String encode(String str){
+        // $5\r\nhello\r\n
+        int length = str.length();
+        String finalString =  "$"+length+"\r\n"+str+"\r\n";
+        System.out.println("the final string to return"+ finalString);
+        return finalString;
+    }
 
     private static CommondType stringType(String str) {
         if (str.startsWith("*")) {
