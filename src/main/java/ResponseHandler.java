@@ -37,7 +37,7 @@ public class ResponseHandler implements Runnable {
           String commond = storedCommonds.get(1);
           switch (commond.toLowerCase()) {
             case Commands.PING:
-              String toBeSent = "+"+"PONG"+"\r\n";
+              String toBeSent = "+PONG"+"\r\n";
               pw.write(toBeSent);
               break;
           
