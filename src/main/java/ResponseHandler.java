@@ -23,14 +23,14 @@ public class ResponseHandler implements Runnable {
       BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       OutputStream outputStream = clientSocket.getOutputStream();
       String input = bufferedReader.readLine();
-      while ((input = bufferedReader.readLine()) != null) {
+      while (input != null) {
         System.out.println("the input>>>" + input);
-        if (input != null) {
-          var result = ProtocolParser.parse(input);
-          var finalResult = ProtocolParser.encode(result);
-          byte []b = finalResult.getBytes(StandardCharsets.UTF_8);
-          outputStream.write(b);
-        }
+
+        var result = ProtocolParser.parse(input);
+        var finalResult = ProtocolParser.encode(result);
+        byte[] b = finalResult.getBytes(StandardCharsets.UTF_8);
+        outputStream.write(b);
+
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
