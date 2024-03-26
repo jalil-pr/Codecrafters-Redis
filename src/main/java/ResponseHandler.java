@@ -28,7 +28,7 @@ public class ResponseHandler implements Runnable {
       // PrintWriter pw = new PrintWriter(outputStream);
     
       String input = reader.readLine();
-      if (input != null && !input.isEmpty()) {
+      while (input != null && !input.isEmpty()) {
         if (input.startsWith("*")) {
           int numberOfLines = Integer.parseInt(String.valueOf(input.charAt(1)));
           System.out.println("number of lines>>"+numberOfLines);
@@ -60,8 +60,10 @@ public class ResponseHandler implements Runnable {
           
         }else {
             // pw.write("WRONG COMMOND");
-            outputStream.close();
+            outputStream.write("WRONG COMMAND".getBytes());
+
         } 
+        input = reader.readLine();
       }
 
     }catch(Exception e){
