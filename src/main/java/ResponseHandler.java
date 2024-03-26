@@ -30,7 +30,7 @@ public class ResponseHandler implements Runnable {
       String input = reader.readLine();
       if (input != null && !input.isEmpty()) {
         if (input.startsWith("*")) {
-          int numberOfLines = input.charAt(1);
+          int numberOfLines = Integer.parseInt(String.valueOf(input.charAt(1)));
           System.out.println("number of lines>>"+numberOfLines);
           ArrayList<String> storedCommands = new ArrayList<>(numberOfLines*2);
           for(int i=0;i<numberOfLines*2;i++){
@@ -38,7 +38,7 @@ public class ResponseHandler implements Runnable {
         
           }
          
-          System.out.println(storedCommands.toString());
+          System.out.println("Stored commands>>>"+storedCommands.toString());
           String command = storedCommands.get(1);
           System.out.println("<<<the commond>>>"+command);
           switch (command.toLowerCase()) {
