@@ -59,7 +59,7 @@ public class ResponseHandler implements Runnable {
               String key = storedCommands.get(3);
               String value = storedCommands.get(5);
               records.put(key, value);
-               if(storedCommands.size()>5){
+               if(storedCommands.size()>6){
                 String px = storedCommands.get(7);
                 if(px == "px"){
                   Long duration = Long.parseLong(storedCommands.get(9));
