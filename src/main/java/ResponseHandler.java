@@ -6,9 +6,14 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.print.DocFlavor.READER;
 
 public class ResponseHandler implements Runnable {
   Socket clientSocket = null;
@@ -19,48 +24,55 @@ public class ResponseHandler implements Runnable {
 
   @Override
   public void run() {
-    // get the input and output
-    System.out.println("######new connection########");
+
     try{
-      // BufferedReader  reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
       BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       OutputStream outputStream = clientSocket.getOutputStream();
-      // PrintWriter pw = new PrintWriter(outputStream);
-    
       String input = reader.readLine();
       while (input != null && !input.isEmpty()) {
+        // temprary set for storing set and get values
+        HashMap<String, String> records = new HashMap<String, String>();
         if (input.startsWith("*")) {
           int numberOfLines = Integer.parseInt(String.valueOf(input.charAt(1)));
-          System.out.println("number of lines>>"+numberOfLines);
           ArrayList<String> storedCommands = new ArrayList<>(numberOfLines*2);
           for(int i=0;i<numberOfLines*2;i++){
             storedCommands.add(reader.readLine());
         
           }
-         
-          System.out.println("Stored commands>>>"+storedCommands.toString());
           String command = storedCommands.get(1);
-          System.out.println("<<<the commond>>>"+command);
           switch (command.toLowerCase()) {
             case Commands.PING:
-              System.out.println("this is to be sent!");
               String toBeSent = "+PONG"+"\r\n";
               outputStream.write(toBeSent.getBytes());
               break;
-          
             case Commands.ECHO:
               String toBeEchoed="$"+storedCommands.get(3).length()+"\r\n"+storedCommands.get(3)+"\r\n";
               outputStream.write(toBeEchoed.getBytes());
               break;
-              // pw.write(toBeEchoed);
+            case Commands.SET:
+              String key = storedCommands.get(3);
+              String value = storedCommands.get(5);
+              records.put(key, value);
+              String setReply = "+OK\r\n";
+              outputStream.write(setReply.getBytes());
+              break;
+            case Commands.GET:
+              String getKey = storedCommands.get(3);
+              String getValue = records.get(getKey);
+              if (getValue == null) {
+                outputStream.write("$-1\r\n".getBytes());
+              }else{
+                String foundValue = "$"+getValue.length()+"\r\n"+getKey+"\r\n";
+                outputStream.write(foundValue.getBytes());
+              }
+              break;
             default:
               outputStream.write("WRONG COMMAND".getBytes());
-              // pw.write("WRONG COMMOND!");
           }
 
           
         }else {
-            // pw.write("WRONG COMMOND");
             outputStream.write("WRONG COMMAND".getBytes());
 
         } 
@@ -68,7 +80,12 @@ public class ResponseHandler implements Runnable {
       }
 
     }catch(Exception e){
-    //  System.out.println("error:"+e.printStackTrace());
+      e.printStackTrace();
+      try {
+        clientSocket.close();
+      } catch (IOException e1) {
+        e1.printStackTrace();
+      }
     }
    
   }
