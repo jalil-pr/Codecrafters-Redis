@@ -51,6 +51,7 @@ public class ResponseHandler implements Runnable {
             case Commands.ECHO:
               String toBeEchoed="$"+storedCommands.get(3).length()+storedCommands.get(3)+"\r\n";
               outputStream.write(toBeEchoed.getBytes());
+              break;
               // pw.write(toBeEchoed);
             default:
               outputStream.write("WRONG COMMAND".getBytes());
