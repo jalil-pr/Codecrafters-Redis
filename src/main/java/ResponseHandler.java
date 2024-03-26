@@ -31,12 +31,13 @@ public class ResponseHandler implements Runnable {
       if (input != null && !input.isEmpty()) {
         if (input.startsWith("*")) {
           int numberOfLines = input.charAt(1);
+          System.out.println("number of lines>>"+numberOfLines);
           ArrayList<String> storedCommands = new ArrayList<>(numberOfLines*2);
           for(int i=0;i<numberOfLines*2;i++){
             storedCommands.add(reader.readLine());
-            System.out.println("stored: "+storedCommands.get(i)+"at index"+i);
+        
           }
-          System.out.println("stored commands!!!!!");
+         
           System.out.println(storedCommands.toString());
           String command = storedCommands.get(1);
           System.out.println("<<<the commond>>>"+command);
