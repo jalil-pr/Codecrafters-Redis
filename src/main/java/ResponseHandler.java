@@ -74,12 +74,21 @@ public class ResponseHandler implements Runnable {
             case Commands.GET:
               String getKey = storedCommands.get(3);
               String getValue = records.get(getKey);
-              Long expiry = recordsExpiry.get(getKey);
-              
+              Long expiry =null;
+              Long storedTime = null;
+              if(timesStore != null){
+                storedTime = timesStore.get(getKey);
+              }
+              if( recordsExpiry != null){
+                expiry = recordsExpiry.get(getKey);
+              }
+              Long difference=null;
               Long currentTime = System.currentTimeMillis();
-              Long storedTime = timesStore.get(getKey);
-              Long difference = Math.abs(currentTime - storedTime);
-              if (getValue == null || difference > expiry) {
+              if(storedTime != null){
+                difference = Math.abs(currentTime - storedTime);
+
+              }
+              if (getValue == null || difference == null || difference > expiry) {
                 outputStream.write("$-1\r\n".getBytes());
               } else {
                 String foundValue = "$" + getValue.length() + "\r\n" + getValue + "\r\n";
