@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +31,10 @@ public class ResponseHandler implements Runnable {
       OutputStream outputStream = clientSocket.getOutputStream();
       String input = reader.readLine();
       HashMap<String, String> records = new HashMap<String, String>();
+      HashMap<String, Long> recordsExpiry = new HashMap<String, Long>();
+      HashMap<String, Long> timesStore = new HashMap<String, Long>();
+      // ThreadLocal<String> threadValue = new ThreadLocal<>();
+      // ThreadLocal<Map<String, String>> threadExpiry = new ThreadLocal<>();
       while (input != null && !input.isEmpty()) {
         // temprary set for storing set and get values
 
@@ -54,15 +59,27 @@ public class ResponseHandler implements Runnable {
               String key = storedCommands.get(3);
               String value = storedCommands.get(5);
               records.put(key, value);
+               if(storedCommands.size()>5){
+                String px = storedCommands.get(7);
+                if(px == "px"){
+                  Long duration = Long.parseLong(storedCommands.get(9));
+                  timesStore.put(key, System.currentTimeMillis());
+                  recordsExpiry.put(key, duration);
 
+                }
+              }
               String setReply = "+OK\r\n";
               outputStream.write(setReply.getBytes());
               break;
             case Commands.GET:
               String getKey = storedCommands.get(3);
               String getValue = records.get(getKey);
-
-              if (getValue == null) {
+              Long expiry = recordsExpiry.get(getKey);
+              
+              Long currentTime = System.currentTimeMillis();
+              Long storedTime = timesStore.get(getKey);
+              Long difference = Math.abs(currentTime - storedTime);
+              if (getValue == null || difference > expiry) {
                 outputStream.write("$-1\r\n".getBytes());
               } else {
                 String foundValue = "$" + getValue.length() + "\r\n" + getValue + "\r\n";
