@@ -27,12 +27,14 @@ public class ResponseHandler implements Runnable {
 
     try{
 
+      System.out.println("******** NEW CONNECTION **********");
       BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       OutputStream outputStream = clientSocket.getOutputStream();
       String input = reader.readLine();
       while (input != null && !input.isEmpty()) {
         // temprary set for storing set and get values
         HashMap<String, String> records = new HashMap<String, String>();
+        
         if (input.startsWith("*")) {
           int numberOfLines = Integer.parseInt(String.valueOf(input.charAt(1)));
           ArrayList<String> storedCommands = new ArrayList<>(numberOfLines*2);
