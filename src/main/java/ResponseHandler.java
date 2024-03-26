@@ -54,6 +54,8 @@ public class ResponseHandler implements Runnable {
               String key = storedCommands.get(3);
               String value = storedCommands.get(5);
               records.put(key, value);
+              System.out.println("**** RECORD VALUES****");
+              System.out.println(records.toString());
               String setReply = "+OK\r\n";
               outputStream.write(setReply.getBytes());
               break;
@@ -61,7 +63,8 @@ public class ResponseHandler implements Runnable {
             System.out.println("#####GET REQUEST#######");
               String getKey = storedCommands.get(3);
               String getValue = records.get(getKey);
-              System.out.println("key requested:"+getKey+" its value:"+getKey);
+              System.out.println("*** record when get request ***:");
+              System.out.println(records.toString());
               if (getValue == null) {
                 outputStream.write("$-1\r\n".getBytes());
               }else{
