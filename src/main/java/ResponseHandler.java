@@ -40,6 +40,7 @@ public class ResponseHandler implements Runnable {
           System.out.println("<<<the commond>>>"+command);
           switch (command.toLowerCase()) {
             case Commands.PING:
+              System.out.println("this is to be sent!");
               String toBeSent = "+PONG"+"\r\n";
               pw.write(toBeSent);
               break;
