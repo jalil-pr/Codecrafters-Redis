@@ -20,7 +20,7 @@ public class ResponseHandler implements Runnable {
   @Override
   public void run() {
     // get the input and output
-    
+    System.out.println("######new connection########");
     try{
       // BufferedReader  reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
