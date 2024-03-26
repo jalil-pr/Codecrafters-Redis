@@ -25,7 +25,7 @@ public class ResponseHandler implements Runnable {
       // BufferedReader  reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       OutputStream outputStream = clientSocket.getOutputStream();
-      PrintWriter pw = new PrintWriter(outputStream);
+      // PrintWriter pw = new PrintWriter(outputStream);
     
       String input = reader.readLine();
       if (input != null && !input.isEmpty()) {
@@ -45,24 +45,27 @@ public class ResponseHandler implements Runnable {
             case Commands.PING:
               System.out.println("this is to be sent!");
               String toBeSent = "+PONG"+"\r\n";
-              pw.write(toBeSent);
+              outputStream.write(toBeSent.getBytes());
               break;
           
             case Commands.ECHO:
               String toBeEchoed="$"+storedCommands.get(3).length()+storedCommands.get(3)+"\r\n";
-              pw.write(toBeEchoed);
+              outputStream.write(toBeEchoed.getBytes());
+              // pw.write(toBeEchoed);
             default:
-              pw.write("WRONG COMMOND!");
+              outputStream.write("WRONG COMMAND".getBytes());
+              // pw.write("WRONG COMMOND!");
           }
 
           
         }else {
-            pw.write("WRONG COMMOND");
+            // pw.write("WRONG COMMOND");
+            outputStream.close();
         } 
       }
 
     }catch(Exception e){
-
+    //  System.out.println("error:"+e.printStackTrace());
     }
    
   }
