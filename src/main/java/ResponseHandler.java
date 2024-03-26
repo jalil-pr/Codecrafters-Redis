@@ -49,7 +49,7 @@ public class ResponseHandler implements Runnable {
               break;
           
             case Commands.ECHO:
-              String toBeEchoed="$"+storedCommands.get(3).length()+storedCommands.get(3)+"\r\n";
+              String toBeEchoed="$"+storedCommands.get(3).length()+"\r\n"+storedCommands.get(3)+"\r\n";
               outputStream.write(toBeEchoed.getBytes());
               break;
               // pw.write(toBeEchoed);
