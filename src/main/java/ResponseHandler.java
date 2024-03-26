@@ -58,8 +58,10 @@ public class ResponseHandler implements Runnable {
               outputStream.write(setReply.getBytes());
               break;
             case Commands.GET:
+            System.out.println("#####GET REQUEST#######");
               String getKey = storedCommands.get(3);
               String getValue = records.get(getKey);
+              System.out.println("key requested:"+getKey+" its value:"+getKey);
               if (getValue == null) {
                 outputStream.write("$-1\r\n".getBytes());
               }else{
