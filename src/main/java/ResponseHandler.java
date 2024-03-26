@@ -31,9 +31,9 @@ public class ResponseHandler implements Runnable {
       BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       OutputStream outputStream = clientSocket.getOutputStream();
       String input = reader.readLine();
+      HashMap<String, String> records = new HashMap<String, String>();
       while (input != null && !input.isEmpty()) {
         // temprary set for storing set and get values
-        HashMap<String, String> records = new HashMap<String, String>();
         
         if (input.startsWith("*")) {
           int numberOfLines = Integer.parseInt(String.valueOf(input.charAt(1)));
