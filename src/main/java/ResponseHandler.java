@@ -20,9 +20,10 @@ public class ResponseHandler implements Runnable {
   @Override
   public void run() {
     // get the input and output
-  
+    
     try{
-      BufferedReader  reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+      // BufferedReader  reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+      BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       OutputStream outputStream = clientSocket.getOutputStream();
       PrintWriter pw = new PrintWriter(outputStream);
     
@@ -30,22 +31,20 @@ public class ResponseHandler implements Runnable {
       if (input != null && !input.isEmpty()) {
         if (input.startsWith("*")) {
           int numberOfLines = input.charAt(1);
-          ArrayList<String> storedCommonds = new ArrayList<>(numberOfLines*2);
+          ArrayList<String> storedCommands = new ArrayList<>(numberOfLines*2);
           for(int i=0;i<numberOfLines*2;i++){
-            storedCommonds.add(reader.readLine());
+            storedCommands.add(reader.readLine());
           }
-          String commond = storedCommonds.get(1);
-          System.out.println("<<<the commond>>>");
-          System.out.println(commond);
-          System.out.println("the PING for reference"+Commands.PING);
-          switch (commond.toLowerCase()) {
+          String command = storedCommands.get(1);
+          System.out.println("<<<the commond>>>"+command);
+          switch (command.toLowerCase()) {
             case Commands.PING:
               String toBeSent = "+PONG"+"\r\n";
               pw.write(toBeSent);
               break;
           
             case Commands.ECHO:
-              String toBeEchoed="$"+storedCommonds.get(3).length()+storedCommonds.get(3)+"\r\n";
+              String toBeEchoed="$"+storedCommands.get(3).length()+storedCommands.get(3)+"\r\n";
               pw.write(toBeEchoed);
             default:
               pw.write("WRONG COMMOND!");

@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,7 +18,6 @@ public class Main {
     ServerSocket serverSocket = null;
     Socket clientSocket = null;
     int port = 6379;
-    ExecutorService es = null;
     try {
       serverSocket = new ServerSocket(port);
       serverSocket.setReuseAddress(true);
