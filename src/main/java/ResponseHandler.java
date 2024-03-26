@@ -34,6 +34,7 @@ public class ResponseHandler implements Runnable {
           ArrayList<String> storedCommands = new ArrayList<>(numberOfLines*2);
           for(int i=0;i<numberOfLines*2;i++){
             storedCommands.add(reader.readLine());
+            System.out.println("stored: "+storedCommands.get(i)+"at index"+i);
           }
           String command = storedCommands.get(1);
           System.out.println("<<<the commond>>>"+command);
