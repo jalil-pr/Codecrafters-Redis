@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +33,7 @@ public class ResponseHandler implements Runnable {
       String input = reader.readLine();
       HashMap<String, String> records = new HashMap<String, String>();
       HashMap<String, Long> recordsExpiry = new HashMap<String, Long>();
-      HashMap<String, Long> timesStore = new HashMap<String, Long>();
+      HashMap<String, Date> timesStore = new HashMap<String, Date>();
       // ThreadLocal<String> threadValue = new ThreadLocal<>();
       // ThreadLocal<Map<String, String>> threadExpiry = new ThreadLocal<>();
       while (input != null && !input.isEmpty()) {
@@ -45,6 +46,7 @@ public class ResponseHandler implements Runnable {
             storedCommands.add(reader.readLine());
 
           }
+
           String command = storedCommands.get(1);
           switch (command.toLowerCase()) {
             case Commands.PING:
@@ -61,11 +63,10 @@ public class ResponseHandler implements Runnable {
               records.put(key, value);
               if (storedCommands.size() > 6) {
                 String px = storedCommands.get(7);
-                if (px == "px") {
-                  Long duration = Long.parseLong(storedCommands.get(9));
-                  timesStore.put(key, System.currentTimeMillis());
-                  recordsExpiry.put(key, duration);
-
+                if (px.equalsIgnoreCase("px")) {
+                  Long validUpto = Long.parseLong(storedCommands.get(9));
+                  timesStore.put(key, new Date());
+                  recordsExpiry.put(key, validUpto);
                 }
               }
               String setReply = "+OK\r\n";
@@ -75,22 +76,21 @@ public class ResponseHandler implements Runnable {
               String getKey = storedCommands.get(3);
               String getValue = records.get(getKey);
               Long expiry = null;
-              Long storedTime = null;
+              Date storedDate = null;
               if (timesStore != null) {
-                storedTime = timesStore.get(getKey);
+                storedDate = timesStore.get(getKey);
               }
               if (recordsExpiry != null) {
                 expiry = recordsExpiry.get(getKey);
               }
               Long difference = null;
-              Long currentTime = System.currentTimeMillis();
-              if (storedTime != null) {
-                difference = Math.abs(currentTime - storedTime);
+              if (storedDate != null) {
+                difference = (new Date().getTime() - storedDate.getTime());
 
               }
               if (getValue == null) {
                 outputStream.write("$-1\r\n".getBytes());
-              } else if (difference != null) {
+              } else if (difference != null && difference > expiry) {
                 outputStream.write("$-1\r\n".getBytes());
               } else {
                 String foundValue = "$" + getValue.length() + "\r\n" + getValue + "\r\n";
