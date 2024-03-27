@@ -59,9 +59,9 @@ public class ResponseHandler implements Runnable {
               String key = storedCommands.get(3);
               String value = storedCommands.get(5);
               records.put(key, value);
-               if(storedCommands.size()>6){
+              if (storedCommands.size() > 6) {
                 String px = storedCommands.get(7);
-                if(px == "px"){
+                if (px == "px") {
                   Long duration = Long.parseLong(storedCommands.get(9));
                   timesStore.put(key, System.currentTimeMillis());
                   recordsExpiry.put(key, duration);
@@ -74,21 +74,23 @@ public class ResponseHandler implements Runnable {
             case Commands.GET:
               String getKey = storedCommands.get(3);
               String getValue = records.get(getKey);
-              Long expiry =null;
+              Long expiry = null;
               Long storedTime = null;
-              if(timesStore != null){
+              if (timesStore != null) {
                 storedTime = timesStore.get(getKey);
               }
-              if( recordsExpiry != null){
+              if (recordsExpiry != null) {
                 expiry = recordsExpiry.get(getKey);
               }
-              Long difference=null;
+              Long difference = null;
               Long currentTime = System.currentTimeMillis();
-              if(storedTime != null){
+              if (storedTime != null) {
                 difference = Math.abs(currentTime - storedTime);
 
               }
-              if (getValue == null || difference == null || difference > expiry) {
+              if (getValue == null) {
+                outputStream.write("$-1\r\n".getBytes());
+              } else if (difference != null) {
                 outputStream.write("$-1\r\n".getBytes());
               } else {
                 String foundValue = "$" + getValue.length() + "\r\n" + getValue + "\r\n";
