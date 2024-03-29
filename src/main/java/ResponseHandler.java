@@ -60,7 +60,11 @@ public class ResponseHandler implements Runnable {
             case Commands.INFO:
               String reqInfo = storedCommands.get(3);
               if (reqInfo.equalsIgnoreCase("replication")) {
-                outputStream.write(("$"+11+"\r\n"+"role:master"+"\r\n").getBytes());
+                if(Main.isReplica){
+                  outputStream.write(("$"+10+"\r\n"+"role:slave"+"\r\n").getBytes());
+                }else{
+                  outputStream.write(("$"+11+"\r\n"+"role:master"+"\r\n").getBytes());
+                }
               }
               break;
 
