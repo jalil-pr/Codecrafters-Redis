@@ -57,6 +57,13 @@ public class ResponseHandler implements Runnable {
               String toBeEchoed = "$" + storedCommands.get(3).length() + "\r\n" + storedCommands.get(3) + "\r\n";
               outputStream.write(toBeEchoed.getBytes());
               break;
+            case Commands.INFO:
+              String reqInfo = storedCommands.get(3);
+              if (reqInfo.equalsIgnoreCase("replication")) {
+                outputStream.write(("$"+11+"\r\n"+"role:master"+"\r\n").getBytes());
+              }
+              break;
+
             case Commands.SET:
               String key = storedCommands.get(3);
               String value = storedCommands.get(5);
