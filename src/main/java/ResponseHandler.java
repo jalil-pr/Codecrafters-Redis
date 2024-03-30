@@ -34,10 +34,19 @@ public class ResponseHandler implements Runnable {
       HashMap<String, String> records = new HashMap<String, String>();
       HashMap<String, Long> recordsExpiry = new HashMap<String, Long>();
       HashMap<String, Date> timesStore = new HashMap<String, Date>();
-      // ThreadLocal<String> threadValue = new ThreadLocal<>();
-      // ThreadLocal<Map<String, String>> threadExpiry = new ThreadLocal<>();
+      HashMap<String, String> infoCommand = new HashMap<>();
+      if(Main.isReplica){
+        infoCommand.put("replica", "slave");
+        // infoCommand.put("master_replid", "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
+        // infoCommand.put("master_repl_offset", "0");
+      }else{
+        // TODO: remove the hard codes
+        infoCommand.put("replica", "master");
+        infoCommand.put("master_replid", "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
+        infoCommand.put("master_repl_offset", "0");
+      }
+     
       while (input != null && !input.isEmpty()) {
-        // temprary set for storing set and get values
 
         if (input.startsWith("*")) {
           int numberOfLines = Integer.parseInt(String.valueOf(input.charAt(1)));
@@ -60,11 +69,17 @@ public class ResponseHandler implements Runnable {
             case Commands.INFO:
               String reqInfo = storedCommands.get(3);
               if (reqInfo.equalsIgnoreCase("replication")) {
-                if(Main.isReplica){
-                  outputStream.write(("$"+10+"\r\n"+"role:slave"+"\r\n").getBytes());
-                }else{
-                  outputStream.write(("$"+11+"\r\n"+"role:master"+"\r\n").getBytes());
+                String response = "";
+                response = response+("role".length()+infoCommand.get("replica").length()+1)+""+"role:"+infoCommand.get("replica")+"\n";
+                if(!Main.isReplica){
+                
+                  response=response+("master_repl_offset".length()+1+infoCommand.get("master_repl_offset").length())+""+"master_repl_offset"+":"+infoCommand.get("master_repl_offset")+"\n";
                 }
+                if(!Main.isReplica){
+                  response=response+("master_replid".length()+1+infoCommand.get("master_replid").length())+""+"master_replid"+":"+infoCommand.get("master_replid");
+                }
+                String finalResponse = "$"+response.length()+"\r\n"+response+"\r\n";
+                outputStream.write(finalResponse.getBytes());
               }
               break;
 
