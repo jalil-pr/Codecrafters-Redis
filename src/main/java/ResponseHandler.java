@@ -30,15 +30,22 @@ public class ResponseHandler implements Runnable {
     try {
       BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       OutputStream outputStream = clientSocket.getOutputStream();
+      PrintWriter printWriter = new PrintWriter(outputStream, false);
       String input = reader.readLine();
+      if (Main.isFirstRequest) {
+        System.out.println("########### FIRST REQUEST #############");
+        Main.isFirstRequest = false;
+        StringBuilder stringBuilder =new StringBuilder();
+        stringBuilder.append("*1\r\n$4\r\nping\r\n");
+        printWriter.write(stringBuilder.toString());
+        
+      }
       HashMap<String, String> records = new HashMap<String, String>();
       HashMap<String, Long> recordsExpiry = new HashMap<String, Long>();
       HashMap<String, Date> timesStore = new HashMap<String, Date>();
       HashMap<String, String> infoCommand = new HashMap<>();
       if(Main.isReplica){
         infoCommand.put("replica", "slave");
-        // infoCommand.put("master_replid", "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
-        // infoCommand.put("master_repl_offset", "0");
       }else{
         // TODO: remove the hard codes
         infoCommand.put("replica", "master");
