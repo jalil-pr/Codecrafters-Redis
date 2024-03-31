@@ -76,18 +76,29 @@ public class Main {
       printWriter.write(greetStr);
       printWriter.flush();
       String pingResponse = reader.readLine();
-      String replConfStr = "*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n"+port+"\r\n";
-      printWriter.write(replConfStr);
-      printWriter.flush();
-      String secondConfStr = "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
-      printWriter.write(secondConfStr);
-      printWriter.flush();
-      // if (pingResponse.contains("ok")) {
-      //   String replConfResponse = reader.readLine();
-      //   if (replConfResponse.contains("ok")) {
-          
-      //   }
-      // }
+      if (pingResponse != null) {
+        String replConfStr = "*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n"+port+"\r\n";
+        printWriter.write(replConfStr);
+        printWriter.flush();
+        String secStageResponse = reader.readLine();
+        if(secStageResponse != null){
+
+          String secondConfStr = "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
+          printWriter.write(secondConfStr);
+          printWriter.flush();
+
+          String thirdStageResp = reader.readLine();
+          // stage 3 handshake: sending psync
+          if (thirdStageResp != null) {
+            String psync = "*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n";
+            printWriter.write(psync);
+            printWriter.flush();
+            
+          }
+        }
+
+      }
+
     }catch(Exception e){
       e.printStackTrace();
     }
