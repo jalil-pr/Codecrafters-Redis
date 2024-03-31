@@ -49,8 +49,10 @@ public class ResponseHandler implements Runnable {
       }else{
         // TODO: remove the hard codes
         infoCommand.put("replica", "master");
-        infoCommand.put("master_replid", "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
-        infoCommand.put("master_repl_offset", "0");
+        Main.masterReplid="8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
+        Main.masterReplOffset=String.valueOf(0);
+        // infoCommand.put("master_replid", "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
+        // infoCommand.put("master_repl_offset", "0");
       }
      
       while (input != null && !input.isEmpty()) {
@@ -80,10 +82,10 @@ public class ResponseHandler implements Runnable {
                 response = response+("role".length()+infoCommand.get("replica").length()+1)+""+"role:"+infoCommand.get("replica")+"\n";
                 if(!Main.isReplica){
                 
-                  response=response+("master_repl_offset".length()+1+infoCommand.get("master_repl_offset").length())+""+"master_repl_offset"+":"+infoCommand.get("master_repl_offset")+"\n";
+                  response=response+("master_repl_offset".length()+1+Main.masterReplOffset.length())+""+"master_repl_offset"+":"+Main.masterReplOffset+"\n";
                 }
                 if(!Main.isReplica){
-                  response=response+("master_replid".length()+1+infoCommand.get("master_replid").length())+""+"master_replid"+":"+infoCommand.get("master_replid");
+                  response=response+("master_replid".length()+1+Main.masterReplid.length())+""+"master_replid"+":"+Main.masterReplid;
                 }
                 String finalResponse = "$"+response.length()+"\r\n"+response+"\r\n";
                 outputStream.write(finalResponse.getBytes());
@@ -119,7 +121,6 @@ public class ResponseHandler implements Runnable {
               Long difference = null;
               if (storedDate != null) {
                 difference = (new Date().getTime() - storedDate.getTime());
-
               }
               if (getValue == null) {
                 outputStream.write("$-1\r\n".getBytes());
@@ -133,6 +134,10 @@ public class ResponseHandler implements Runnable {
             case Commands.REPLCONF:
               String replConfResp = "+OK" + "\r\n";
               outputStream.write(replConfResp.getBytes());
+              break;
+            case Commands.PSYNC:
+              String pSyncResp = "+FULLRESYNC"+" "+Main.masterReplid+" " +Main.masterReplOffset +"\r\n";
+              outputStream.write(pSyncResp.getBytes());
               break;
 
             default:

@@ -20,6 +20,9 @@ public class Main {
   public static int serverPort=-1;
   public static boolean isFirstRequest=true;
   static int port = DEFAULT_PORT;
+  public static String masterReplid;
+  public static String masterReplOffset;
+
 
   
   public static void main(String[] args) {
