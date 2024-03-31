@@ -5,6 +5,7 @@ public class Commands {
      public static final String GET="get";
      public static final String PX="px";
      public static final String INFO="info";
+     public static final String REPLCONF="replconf";
 
 
      

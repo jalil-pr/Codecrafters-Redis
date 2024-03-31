@@ -130,6 +130,11 @@ public class ResponseHandler implements Runnable {
                 outputStream.write(foundValue.getBytes());
               }
               break;
+            case Commands.REPLCONF:
+              String replConfResp = "+OK" + "\r\n";
+              outputStream.write(replConfResp.getBytes());
+              break;
+
             default:
               outputStream.write("WRONG COMMAND".getBytes());
           }
