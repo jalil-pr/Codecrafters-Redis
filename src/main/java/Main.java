@@ -19,10 +19,10 @@ public class Main {
   public static String replicaOf=null;
   public static int serverPort=-1;
   public static boolean isFirstRequest=true;
+  static int port = DEFAULT_PORT;
 
   
   public static void main(String[] args) {
-    int port = DEFAULT_PORT;
     // public static 
     for(int i=0;i<args.length;i++){
       if (args[i].equalsIgnoreCase("--port")) {
@@ -71,9 +71,23 @@ public class Main {
     try{
 
       PrintWriter printWriter = new PrintWriter(clientSocket.getOutputStream());
+      BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       String greetStr = "*1\r\n$4\r\nping\r\n";
       printWriter.write(greetStr);
       printWriter.flush();
+      String pingResponse = reader.readLine();
+      String replConfStr = "*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n"+port+"\r\n";
+      printWriter.write(replConfStr);
+      printWriter.flush();
+      String secondConfStr = "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
+      printWriter.write(secondConfStr);
+      printWriter.flush();
+      // if (pingResponse.contains("ok")) {
+      //   String replConfResponse = reader.readLine();
+      //   if (replConfResponse.contains("ok")) {
+          
+      //   }
+      // }
     }catch(Exception e){
       e.printStackTrace();
     }
