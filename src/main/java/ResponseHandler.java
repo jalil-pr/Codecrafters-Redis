@@ -1,21 +1,17 @@
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.print.DocFlavor.READER;
 
 public class ResponseHandler implements Runnable {
   Socket clientSocket = null;
@@ -33,28 +29,26 @@ public class ResponseHandler implements Runnable {
       PrintWriter printWriter = new PrintWriter(outputStream, false);
       String input = reader.readLine();
       if (Main.isFirstRequest) {
-        System.out.println("########### FIRST REQUEST #############");
         Main.isFirstRequest = false;
-        StringBuilder stringBuilder =new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("*1\r\n$4\r\nping\r\n");
         printWriter.write(stringBuilder.toString());
-        
+
       }
       HashMap<String, String> records = new HashMap<String, String>();
       HashMap<String, Long> recordsExpiry = new HashMap<String, Long>();
       HashMap<String, Date> timesStore = new HashMap<String, Date>();
       HashMap<String, String> infoCommand = new HashMap<>();
-      if(Main.isReplica){
+      if (Main.isReplica) {
         infoCommand.put("replica", "slave");
-      }else{
+      } else {
         // TODO: remove the hard codes
         infoCommand.put("replica", "master");
-        Main.masterReplid="8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
-        Main.masterReplOffset=String.valueOf(0);
-        // infoCommand.put("master_replid", "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
-        // infoCommand.put("master_repl_offset", "0");
+        Main.masterReplid = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
+        Main.masterReplOffset = String.valueOf(0);
+
       }
-     
+
       while (input != null && !input.isEmpty()) {
 
         if (input.startsWith("*")) {
@@ -79,15 +73,18 @@ public class ResponseHandler implements Runnable {
               String reqInfo = storedCommands.get(3);
               if (reqInfo.equalsIgnoreCase("replication")) {
                 String response = "";
-                response = response+("role".length()+infoCommand.get("replica").length()+1)+""+"role:"+infoCommand.get("replica")+"\n";
-                if(!Main.isReplica){
-                
-                  response=response+("master_repl_offset".length()+1+Main.masterReplOffset.length())+""+"master_repl_offset"+":"+Main.masterReplOffset+"\n";
+                response = response + ("role".length() + infoCommand.get("replica").length() + 1) + "" + "role:"
+                    + infoCommand.get("replica") + "\n";
+                if (!Main.isReplica) {
+
+                  response = response + ("master_repl_offset".length() + 1 + Main.masterReplOffset.length()) + ""
+                      + "master_repl_offset" + ":" + Main.masterReplOffset + "\n";
                 }
-                if(!Main.isReplica){
-                  response=response+("master_replid".length()+1+Main.masterReplid.length())+""+"master_replid"+":"+Main.masterReplid;
+                if (!Main.isReplica) {
+                  response = response + ("master_replid".length() + 1 + Main.masterReplid.length()) + ""
+                      + "master_replid" + ":" + Main.masterReplid;
                 }
-                String finalResponse = "$"+response.length()+"\r\n"+response+"\r\n";
+                String finalResponse = "$" + response.length() + "\r\n" + response + "\r\n";
                 outputStream.write(finalResponse.getBytes());
               }
               break;
@@ -136,8 +133,17 @@ public class ResponseHandler implements Runnable {
               outputStream.write(replConfResp.getBytes());
               break;
             case Commands.PSYNC:
-              String pSyncResp = "+FULLRESYNC"+" "+Main.masterReplid+" " +Main.masterReplOffset +"\r\n";
+              String pSyncResp = "+FULLRESYNC" + " " + Main.masterReplid + " " + Main.masterReplOffset + "\r\n";
               outputStream.write(pSyncResp.getBytes());
+              String emptyRBDFile = "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
+              byte[] emptyFileContent = Base64.getDecoder().decode(emptyRBDFile);
+              byte[] fileSize = ("$" + emptyFileContent.length + "\r\n")
+                  .getBytes(StandardCharsets.UTF_8);
+              ByteBuffer buffer = ByteBuffer.wrap(
+                  new byte[emptyFileContent.length + fileSize.length]);
+              buffer.put(fileSize);
+              buffer.put(emptyFileContent);
+              outputStream.write(buffer.array());
               break;
 
             default:
