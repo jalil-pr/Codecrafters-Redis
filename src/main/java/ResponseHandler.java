@@ -15,6 +15,7 @@ import java.util.HashMap;
 
 public class ResponseHandler implements Runnable {
   Socket clientSocket = null;
+  boolean shouldPropagateCommands = false;
 
   ResponseHandler(Socket client) {
     clientSocket = client;
@@ -103,6 +104,20 @@ public class ResponseHandler implements Runnable {
               }
               String setReply = "+OK\r\n";
               outputStream.write(setReply.getBytes());
+
+              Main.slaveSockets.forEach(socket -> {
+                  StringBuilder sb = new StringBuilder();
+                  sb.append("*3\r\n").append("$3\r\nSET\r\n").append("$").append(key.length()).append("\r\n")
+                      .append(key).append("\r\n").append("$" + value.length()).append("\r\n").append(value)
+                      .append("\r\n");
+                  try {
+                    OutputStream out = socket.getOutputStream();
+                    out.write(sb.toString().getBytes());
+                  } catch (IOException e) {
+                    e.printStackTrace();
+                  }             
+              });
+
               break;
             case Commands.GET:
               String getKey = storedCommands.get(3);
@@ -144,6 +159,7 @@ public class ResponseHandler implements Runnable {
               buffer.put(fileSize);
               buffer.put(emptyFileContent);
               outputStream.write(buffer.array());
+              Main.slaveSockets.add(clientSocket);
               break;
 
             default:

@@ -9,6 +9,8 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,6 +24,7 @@ public class Main {
   static int port = DEFAULT_PORT;
   public static String masterReplid;
   public static String masterReplOffset;
+  public static List<Socket> slaveSockets = new ArrayList<>();
 
 
   
@@ -46,6 +49,7 @@ public class Main {
         if (replicaOf != null) {
           if(serverPort!=-1){
             clientSocket = new Socket(replicaOf, serverPort);
+            slaveSockets.add(clientSocket);
             greetServer(clientSocket);
           }
         }
