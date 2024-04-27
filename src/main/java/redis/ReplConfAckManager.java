@@ -10,8 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import redis.Commands.RedisCommand;
 import redis.Commands.ReplConfCommand;
 
-
-
 public final class ReplConfAckManager {
     private Map<Object, Set<ClientConnection>> waitFollowerSets = new ConcurrentHashMap<>();
     private Map<Object, Set<ClientConnection>> ackFollowerSets = new ConcurrentHashMap<>();
@@ -26,7 +24,6 @@ public final class ReplConfAckManager {
         this.testingDontWaitForAck = testingDontWaitForAck;
     }
 
-    // get notified that a connection has received a replconf ack
     public void notifyGotAckFromFollower(ClientConnection connection) {
         waitFollowerSets.forEach((lock, connectionSet) -> {
             if (connectionSet.contains(connection)) {
@@ -38,24 +35,22 @@ public final class ReplConfAckManager {
         });
     }
 
-    // wait for a set of connections to receive a replconf ack
     public int waitForAcksFromFollowerSet(int requestWaitFor, Set<ClientConnection> followerSet,
             Clock clock,
             long timeoutMillis) {
         int result = 0;
-        // create lock for waiting on acks from this set of connections
+
         Object lock = new Object();
         waitFollowerSets.put(lock, followerSet);
         Set<ClientConnection> ackSet = new HashSet<>();
         ackFollowerSets.put(lock, ackSet);
         synchronized (lock) {
-            // send the requests inside the synchronized lock, but before we start the timer
+
             followerSet.forEach(this::sendCommand);
 
             long start = clock.millis();
             long now = start;
-            // wait for either the requested number of acks or all current followers, whichever is
-            // less
+
             int numToWaitFor = Math.min(requestWaitFor, followerSet.size());
             if (testingDontWaitForAck) {
                 return followerSet.size();
@@ -67,9 +62,9 @@ public final class ReplConfAckManager {
                     // ack has been received
                     lock.wait(start + timeoutMillis - now);
                     System.out.println(String.format(
-                        "ReplConfAckManager: lock notified %d acks of %d requested",
-                        ackSet.size(),
-                        numToWaitFor));
+                            "ReplConfAckManager: lock notified %d acks of %d requested",
+                            ackSet.size(),
+                            numToWaitFor));
                     now = clock.millis();
                     result = ackSet.size();
                 }
