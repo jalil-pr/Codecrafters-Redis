@@ -104,12 +104,6 @@ public class ConfigCommand extends RedisCommand {
                 new RespBulkString(action.name().toLowerCase().getBytes()), new RespBulkString(key.getBytes()) })
                         .asResponse();
     }
-
-    /**
-     * Returns a string representation of the GetCommand object.
-     * 
-     * @return a string representation of the GetCommand object
-     */
     @Override
     public String toString() {
         return "ConfigCommand [action=" + action + ", key=" + key + "]";
