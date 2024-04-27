@@ -15,8 +15,6 @@ import redis.protocol.RespBulkString;
 import redis.protocol.RespValue;
 import redis.protocol.RespValueParser;
 
-
-
 public class ConnectionToLeader {
     // keep a list of socket connections and continue checking for new connections
     private final FollowerService service;
@@ -111,13 +109,13 @@ public class ConnectionToLeader {
         System.out.println(String.format("Terminate follower invoked. Closing socket to leader %s.",
                 service.getLeaderClientSocket()));
         done = true;
-        // close the connection to the leader
+
         try {
             service.getLeaderClientSocket().close();
         } catch (IOException e) {
             System.out.println("IOException on socket close: " + e.getMessage());
         }
-        // executor close - waits for thread to finish
+
         executor.close();
     }
 
@@ -131,19 +129,16 @@ public class ConnectionToLeader {
                 continue;
             }
 
-            // check for handshake commands waiting to be sent
             try {
                 while (!commandsToLeader.isEmpty()) {
                     CommandAndResponseConsumer cmd = commandsToLeader.pollFirst();
-                    // send the command to the leader
+
                     System.out.println(String.format("Sending leader command: %s", cmd.command));
                     leaderConnection.writeFlush(cmd.command.asCommand());
 
-                    // read the response - will wait on the stream until the whole value is parsed
                     RespValue response = leaderConnection.readValue();
                     System.out.println(String.format("Received leader response: %s", response));
 
-                    // responseConsumer returns True if we expect the RDB value from the command
                     if (cmd.responseConsumer.apply(cmd.command, response)) {
                         try {
                             byte[] rdb = leaderConnection.readRDB();
@@ -189,8 +184,6 @@ public class ConnectionToLeader {
             System.out.println(String.format("Received request from leader: %s", conn));
         }
 
-        // if the command came from the leader, then for most commands the leader does not
-        // expect a response
         boolean writeResponse = shouldSendResponseToConnection(command, conn);
 
         byte[] response = command.execute(service);
