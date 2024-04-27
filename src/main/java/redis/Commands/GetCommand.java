@@ -17,9 +17,7 @@ import redis.protocol.RespValue;
 public class GetCommand extends RedisCommand {
     private RespBulkString key;
 
-    /**
-     * Constructs a new GetCommand object with the GET command type.
-     */
+ 
     public GetCommand() {
         super(Type.GET);
     }
@@ -79,11 +77,6 @@ public class GetCommand extends RedisCommand {
         return RespConstants.NULL;
     }
 
-    /**
-     * Returns a string representation of the GetCommand object.
-     * 
-     * @return a string representation of the GetCommand object
-     */
     @Override
     public String toString() {
         return "GetCommand [key=" + key + "]";

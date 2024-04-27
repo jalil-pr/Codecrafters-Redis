@@ -34,7 +34,6 @@ public class ReplConfCommand extends RedisCommand {
             return name;
         }
     }
-
     private static ArgReader ARG_READER = new ArgReader(Type.REPLCONF.name(),
             new String[] { ":string", // command name
                     "[ack:int capa:string getack:string listening-port:int]" });
