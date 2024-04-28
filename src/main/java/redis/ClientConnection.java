@@ -16,14 +16,6 @@ import redis.protocol.RespValueBase;
 import redis.protocol.RespValueContext;
 import redis.protocol.RespValueParser;
 
-// import org.baylight.redis.io.BufferedInputLineReader;
-// import org.baylight.redis.io.BufferedResponseStreamWriter;
-// import org.baylight.redis.protocol.RespSimpleErrorValue;
-// import org.baylight.redis.protocol.RespValue;
-// import org.baylight.redis.protocol.RespValueBase;
-// import org.baylight.redis.protocol.RespValueContext;
-// import org.baylight.redis.protocol.RespValueParser;
-
 public class ClientConnection {
     private final Socket clientSocket;
     private final RespValueParser valueParser;

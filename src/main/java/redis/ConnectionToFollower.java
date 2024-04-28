@@ -6,19 +6,10 @@ import redis.Commands.ReplConfCommand;
 import redis.protocol.RespSimpleStringValue;
 import redis.protocol.RespValue;
 
-
-
 public class ConnectionToFollower {
     private final LeaderService service;
     private final ClientConnection followerConnection;
 
-    /**
-     * WORKAROUND for codecrafters integration test "replication-17" Stage 17 expects our service to
-     * not send a REPLCONF to the followers during the WAIT command. But, Stage 18 expects it to be
-     * sent and we need to wait for the ACK. So, in order to support Stage17 test, we will skip
-     * waiting. The test replicas don't respond to the GETACK, but the service needs to respond
-     * immediately to pass test replication-17.
-     **/
     private volatile boolean testingDontWaitForAck = true;
 
     public ConnectionToFollower(LeaderService service, ClientConnection followerConnection)
@@ -36,7 +27,8 @@ public class ConnectionToFollower {
     }
 
     /**
-     * Caller can set this when it wants to start waiting for a ACK response. For codecrafters
+     * Caller can set this when it wants to start waiting for a ACK response. For
+     * codecrafters
      * integration test, this means tests that first have replicated commands.
      * 
      * @param testingDontWaitForAck

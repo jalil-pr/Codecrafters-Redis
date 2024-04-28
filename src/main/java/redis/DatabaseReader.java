@@ -11,7 +11,6 @@ import java.util.Map;
 import redis.rdb.OpCode;
 import redis.rdb.RdbFileParser;
 
-
 public class DatabaseReader {
 
     private final File dbFile;

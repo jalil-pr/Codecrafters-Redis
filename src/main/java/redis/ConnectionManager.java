@@ -13,8 +13,6 @@ import java.util.function.BiConsumer;
 
 import redis.protocol.RespValue;
 
-// import org.baylight.redis.protocol.RespValue;
-
 public class ConnectionManager {
     private final Deque<ClientConnection> clientSockets = new ConcurrentLinkedDeque<>();
     private final Map<ClientConnection, Queue<RespValue>> clientValues = new ConcurrentHashMap<>();
@@ -74,7 +72,8 @@ public class ConnectionManager {
     }
 
     public void addPriorityConnection(ClientConnection priorityConnection) {
-        // for followers that listen to a leader, the leader connection should be the first
+        // for followers that listen to a leader, the leader connection should be the
+        // first
         // connection in the queue so getNextValue will prioritize replication commands
         // from the leader before commands from other clients
         clientSockets.addFirst(priorityConnection);
