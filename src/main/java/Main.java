@@ -1,8 +1,8 @@
 
-import redis.ServiceRunner;
+import redis.RedisRunner;
 
 public class Main {
   public static void main(String[] args) {
-    new ServiceRunner(args).run();
+    new RedisRunner(args).run();
   }
 }

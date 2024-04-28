@@ -3,18 +3,18 @@ package redis;
 import java.io.IOException;
 import java.time.Clock;
 
-public class ServiceRunner implements Runnable {
+public class RedisRunner implements Runnable {
     RedisServiceOptions options;
     RedisServiceBase service = null;
 
-    public ServiceRunner(String... args) {
+    public RedisRunner(String... args) {
         options = new RedisServiceOptions();
         if (!options.parseArgs(args)) {
             throw new RuntimeException("Invalid arguments");
         }
     }
 
-    public ServiceRunner(RedisServiceOptions options) {
+    public RedisRunner(RedisServiceOptions options) {
         this.options = options;
     }
 
