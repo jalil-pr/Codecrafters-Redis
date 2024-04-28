@@ -7,7 +7,6 @@ import java.util.Map;
 
 import redis.StoredData;
 
-// import org.baylight.redis.StoredData;
 
 public class RdbFileParser {
 
